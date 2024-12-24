@@ -1,0 +1,17 @@
+# Config file for Air
+[build]
+cmd = "go build -o main ."
+bin = "main"
+full_bin = "./main"
+watch_dir = "."
+exclude_dir = ["vendor"]
+include_ext = ["go", "tpl", "tmpl", "html"]
+exclude_file = ["*_test.go"]
+force_bin = true
+
+[log]
+level = "debug"
+
+[runner]
+# Delay in milliseconds before restarting the app after a change
+delay = 200
