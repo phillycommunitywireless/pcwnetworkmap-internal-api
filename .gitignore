@@ -1,5 +1,12 @@
-.env
+_site
+.sass-cache
+.jekyll-cache
+.jekyll-metadata
+vendor
+# creds
 pcw-golang-3.json
-/tmp/
-*.exe
-*toml
+credentials.base64
+# protected
+.env
+api/tmp
+/tmp

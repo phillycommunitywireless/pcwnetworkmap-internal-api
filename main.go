@@ -22,7 +22,7 @@ func main() {
 	err := godotenv.Load(".env")
 
 	if err != nil {
-		log.Fatalf("Error loading .env file")
+		log.Println("Warning: .env file not found. Falling back to environment variables.")
 	}
 
 	// Initialize GCP services
@@ -39,6 +39,10 @@ func main() {
 
 	// Routes
 	e.GET("/", handleRoot)
+	e.GET("/get_networkpoints", func(c echo.Context) error { return handleGetNetworkpoints(c, sheetsService) })
+	e.GET("/get_level1", func(c echo.Context) error { return handleGetLevel1(c, sheetsService) })
+	e.GET("/get_level2", func(c echo.Context) error { return handleGetLevel2(c, sheetsService) })
+	e.GET("/get_level3", func(c echo.Context) error { return handleGetLevel3(c, sheetsService) })
 
 	// auth
 	e.GET("/login", func(c echo.Context) error { return handleLogin(c, oauthConfig) })
@@ -149,7 +153,41 @@ func handleProtected(c echo.Context) error {
 }
 
 func handleGetInternal(c echo.Context, sheetsService *sheets.Service) error {
-	networkpoints := process_internal(sheetsService)
+	sheet_values := get_sheet_values(sheetsService, "internal")
+	networkpoints := process_networkpoints_and_internal(sheet_values)
+	// networkpoints := process_internal(sheetsService)
 	shelled := prep_for_export(networkpoints)
+	return c.JSON(http.StatusOK, shelled)
+}
+
+func handleGetNetworkpoints(c echo.Context, sheetsService *sheets.Service) error {
+	sheet_values := get_sheet_values(sheetsService, "networkpoints")
+	networkpoints := process_networkpoints_and_internal(sheet_values)
+	// networkpoints := process_internal(sheetsService)
+	shelled := prep_for_export(networkpoints)
+	return c.JSON(http.StatusOK, shelled)
+}
+
+func handleGetLevel1(c echo.Context, sheetsService *sheets.Service) error {
+	sheet_values := get_sheet_values(sheetsService, "level1")
+	networkpoints := process_level1(sheet_values)
+	// networkpoints := process_internal(sheetsService)
+	shelled := prep_for_export_level1(networkpoints)
+	return c.JSON(http.StatusOK, shelled)
+}
+
+func handleGetLevel2(c echo.Context, sheetsService *sheets.Service) error {
+	sheet_values := get_sheet_values(sheetsService, "level2")
+	networkpoints := process_level2_level3(sheet_values)
+	// networkpoints := process_internal(sheetsService)
+	shelled := prep_for_export_level2_3(networkpoints)
+	return c.JSON(http.StatusOK, shelled)
+}
+
+func handleGetLevel3(c echo.Context, sheetsService *sheets.Service) error {
+	sheet_values := get_sheet_values(sheetsService, "level3")
+	networkpoints := process_level2_level3(sheet_values)
+	// networkpoints := process_internal(sheetsService)
+	shelled := prep_for_export_level2_3(networkpoints)
 	return c.JSON(http.StatusOK, shelled)
 }

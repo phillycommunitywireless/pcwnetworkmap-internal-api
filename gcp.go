@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/base64"
 	"log"
 	"os"
 
@@ -17,23 +18,30 @@ func setUpGoogleSheetsAPI() *sheets.Service {
 	err := godotenv.Load(".env")
 
 	if err != nil {
-		log.Fatalf("Error loading .env file")
+		log.Println("Warning: .env file not found. Falling back to environment variables.")
 	}
 
 	// get fname of sheetsAPI credentials service account
-	os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", os.Getenv("GCP_SHEETS_CREDENTIAL_PATH"))
-
+	// os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", os.Getenv("GCP_SHEETS_CREDENTIAL_PATH"))
 	// Retrieve the value to verify it's set
 	// value := os.Getenv("GOOGLE_APPLICATION_CREDENTIALS")
 	// fmt.Println(value)
 
+	encodedCredentials := os.Getenv("GCP_SHEETS_CREDENTIALS_BASE64")
+	decodedCredentials, err := base64.StdEncoding.DecodeString(encodedCredentials)
+	if err != nil {
+		log.Fatalf("Failed to decode base64 credentials: %v", err)
+	}
+
+	config, err := google.JWTConfigFromJSON(decodedCredentials, sheets.SpreadsheetsReadonlyScope)
+	if err != nil {
+		log.Fatalf("Failed to parse credentials: %v", err)
+	}
+
 	ctx := context.Background()
 
 	// Use service account or OAuth2 credentials
-	client, err := google.DefaultClient(ctx, sheets.SpreadsheetsReadonlyScope)
-	if err != nil {
-		log.Fatalf("Failed to create client: %v", err)
-	}
+	client := config.Client(ctx)
 
 	sheetsService, err := sheets.New(client)
 	if err != nil {
@@ -54,7 +62,7 @@ func setupGoogleOAuth() *oauth2.Config {
 	err := godotenv.Load(".env")
 
 	if err != nil {
-		log.Fatalf("Error loading .env file")
+		log.Println("Warning: .env file not found. Falling back to environment variables.")
 	}
 
 	// Replace with your own Google OAuth2 credentials
