@@ -59,7 +59,9 @@ func main() {
 	}))
 
 	// Start server
-	e.Logger.Fatal(e.Start(os.Getenv("PORT")))
+	port := os.Getenv("PORT")
+	address := ":" + port
+	e.Logger.Fatal(e.Start(address))
 }
 
 // Handlers
