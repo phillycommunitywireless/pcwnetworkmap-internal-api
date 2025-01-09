@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -146,7 +147,10 @@ func handleAuthCallback(c echo.Context, oauthConfig *oauth2.Config) error {
 	// 	"token":   tokenString,
 	// })
 	// prod - redir to protected URL (map)
-	return c.Redirect(http.StatusMovedPermanently, "http://127.0.0.1:4000?jwt="+tokenString)
+	// return c.Redirect(http.StatusMovedPermanently, "http://127.0.0.1:4000?jwt="+tokenString)
+	// Redirect to base URL with JWT
+	baseURL := fmt.Sprintf("%s://%s", c.Scheme(), c.Request().Host)
+	return c.Redirect(http.StatusMovedPermanently, baseURL+"?jwt="+tokenString)
 }
 
 func handleProtected(c echo.Context) error {
