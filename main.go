@@ -146,7 +146,14 @@ func handleAuthCallback(c echo.Context, oauthConfig *oauth2.Config) error {
 	// 	"token":   tokenString,
 	// })
 	// prod - redir to protected URL (map)
-	return c.Redirect(http.StatusMovedPermanently, "http://127.0.0.1:4000?jwt="+tokenString)
+	env := os.Getenv("ENV")
+	if env == "dev" {
+		redir_base_url := "http://127.0.0.1:4000?jwt="
+		return c.Redirect(http.StatusMovedPermanently, redir_base_url+tokenString)
+	} else {
+		redir_base_url := "https://pcwnetworkmap-internal-594393b80c0a.herokuapp.com?jwt="
+		return c.Redirect(http.StatusMovedPermanently, redir_base_url+tokenString)
+	}
 
 	// Redirect to base URL with JWT
 	// baseURL := fmt.Sprintf("%s://%s", c.Scheme(), c.Request().Host)
