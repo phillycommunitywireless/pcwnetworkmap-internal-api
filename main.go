@@ -136,6 +136,7 @@ func handleAuthCallback(c echo.Context, oauthConfig *oauth2.Config) error {
 	// to make secure requests down the line
 	// https://stackoverflow.com/questions/1022112/why-doesnt-document-cookie-show-all-the-cookie-for-the-site
 	cookie.HttpOnly = false
+	cookie.SameSite = http.SameSiteNoneMode
 	c.SetCookie(cookie)
 
 	// demo - show successful login by returning JWT
