@@ -21,12 +21,7 @@ func setUpGoogleSheetsAPI() *sheets.Service {
 		log.Println("Warning: .env file not found. Falling back to environment variables.")
 	}
 
-	// get fname of sheetsAPI credentials service account
-	// os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", os.Getenv("GCP_SHEETS_CREDENTIAL_PATH"))
-	// Retrieve the value to verify it's set
-	// value := os.Getenv("GOOGLE_APPLICATION_CREDENTIALS")
-	// fmt.Println(value)
-
+	// load b64 encoded GCP Sheets api credentials
 	encodedCredentials := os.Getenv("GCP_SHEETS_CREDENTIALS_BASE64")
 	decodedCredentials, err := base64.StdEncoding.DecodeString(encodedCredentials)
 	if err != nil {

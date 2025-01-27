@@ -48,11 +48,7 @@ func main() {
 	e.GET("/login", func(c echo.Context) error { return handleLogin(c, oauthConfig) })
 	e.GET("/auth/callback", func(c echo.Context) error { return handleAuthCallback(c, oauthConfig) })
 
-	// protected
-	e.GET("/protected", handleProtected, echojwt.WithConfig(echojwt.Config{
-		SigningKey:  jwtSecret,
-		TokenLookup: "cookie:Authorization",
-	}))
+	// route for internal endpoints
 	e.GET("/get_internal", func(c echo.Context) error { return handleGetInternal(c, sheetsService) }, echojwt.WithConfig(echojwt.Config{
 		SigningKey:  jwtSecret,
 		TokenLookup: "header:Authorization:Bearer ,cookie:Authorization",
@@ -144,14 +140,8 @@ func handleAuthCallback(c echo.Context, oauthConfig *oauth2.Config) error {
 	// 	"token":   tokenString,
 	// })
 	// prod - redir to protected URL (map)
+	// change this URL to change based off of env
 	return c.Redirect(http.StatusMovedPermanently, "http://127.0.0.1:4000/")
-}
-
-func handleProtected(c echo.Context) error {
-	user := c.Get("user").(*jwt.Token)
-	claims := user.Claims.(jwt.MapClaims)
-	email := claims["email"].(string)
-	return c.String(http.StatusOK, "Welcome to the protected page, "+email)
 }
 
 func handleGetInternal(c echo.Context, sheetsService *sheets.Service) error {
