@@ -11,6 +11,9 @@ This repo is the API that [`pcwnetworkmap`](https://github.com/phillycommunitywi
 * `structs.go`- structs that are used to define the geojson response - see the file for more detailed information
 * `gcp.go` - setting up the GCP Sheets service + oauth client configuration for authN. 
 
+## Environment Variables 
+See `env_file_schema.md` for required environment variables
+
 ## Tests
 * Run `go test`
 * See the golang documentation for [writing tests](https://go.dev/doc/tutorial/add-a-test) for more information. 
