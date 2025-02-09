@@ -132,6 +132,8 @@ func handleAuthCallback(c echo.Context, oauthConfig *oauth2.Config) error {
 	// to make secure requests down the line
 	// https://stackoverflow.com/questions/1022112/why-doesnt-document-cookie-show-all-the-cookie-for-the-site
 	cookie.HttpOnly = false
+	// cookie.SameSite = http.SameSiteNoneMode
+	// cookie.Secure = true
 	c.SetCookie(cookie)
 
 	// demo - show successful login by returning JWT
@@ -140,8 +142,18 @@ func handleAuthCallback(c echo.Context, oauthConfig *oauth2.Config) error {
 	// 	"token":   tokenString,
 	// })
 	// prod - redir to protected URL (map)
-	// change this URL to change based off of env
-	return c.Redirect(http.StatusMovedPermanently, "http://127.0.0.1:4000/")
+	env := os.Getenv("ENV")
+	if env == "dev" {
+		redir_base_url := "http://127.0.0.1:4000?jwt="
+		return c.Redirect(http.StatusMovedPermanently, redir_base_url+tokenString)
+	} else {
+		redir_base_url := "https://pcwnetworkmap-internal-594393b80c0a.herokuapp.com?jwt="
+		return c.Redirect(http.StatusMovedPermanently, redir_base_url+tokenString)
+	}
+
+	// Redirect to base URL with JWT
+	// baseURL := fmt.Sprintf("%s://%s", c.Scheme(), c.Request().Host)
+	// return c.Redirect(http.StatusMovedPermanently, baseURL+"?jwt="+tokenString)
 }
 
 func handleGetInternal(c echo.Context, sheetsService *sheets.Service) error {
