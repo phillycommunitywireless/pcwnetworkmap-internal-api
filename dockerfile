@@ -14,5 +14,11 @@ RUN go install github.com/air-verse/air@latest
 COPY go.mod go.sum ./
 RUN go mod tidy
 
+# copy all files 
+COPY . .
+
+# expose port 
+EXPOSE 8080
+
 # run air to watch for changes
 CMD ["air"]
